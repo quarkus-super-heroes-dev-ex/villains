@@ -1,0 +1,69 @@
+quarkus:
+  application:
+    name: rest-villains
+  log:
+    level: INFO
+    category:
+      "io.quarkus.sample.superheroes":
+        level: DEBUG
+    console:
+      format: "%d{HH:mm:ss} %-5p traceId=%X{traceId}, parentId=%X{parentId}, spanId=%X{spanId}, sampled=%X{sampled} [%c{2.}] (%t) %s%e%n"
+      level: INFO
+      darken: 1
+  otel:
+    resource:
+      attributes: "app=${quarkus.application.name},application=villains-service,system=quarkus-super-heroes"
+    exporter:
+      otlp:
+        traces:
+          endpoint: ${OTEL_URL}
+  datasource:
+    db-kind: postgresql
+    username: ${VILLAINS_DB_USER}
+    password: ${VILLAINS_DB_PWD}
+    jdbc:
+      url: "jdbc:postgresql://${VILLAINS_DB_HOST}/${VILLAINS_DB_SCHEMA}"
+  hibernate-orm:
+    database:
+      generation: 
+        ~: update
+  http:
+    cors:
+      ~: true
+      origins: "*"
+    port: ${VILLAIN_SERVICE_PORT}
+    test-port: 0
+  jackson:
+    serialization-inclusion: non-empty
+  smallrye-openapi:
+    info-title: Villains API
+    info-description: This API allows CRUD operations on a villain
+    info-version: 1.0
+    info-contact-name: Quarkus
+    info-contact-url: https://github.com/quarkusio
+  swagger-ui:
+    always-include: true
+  devservices:
+    enabled: false
+villain:
+  level:
+    multiplier: 0.5
+"%dev":
+  quarkus:
+    log:
+      console:
+        format: "%d{HH:mm:ss} %-5p [%c{2.}] (%t) %s%e%n"
+        level: DEBUG
+
+"%test":
+  quarkus:
+    log:
+      console:
+        format: "%d{HH:mm:ss} %-5p [%c{2.}] (%t) %s%e%n"
+        level: DEBUG
+
+"%prod":
+  quarkus:
+    hibernate-orm:
+      sql-load-script: import.sql
+
